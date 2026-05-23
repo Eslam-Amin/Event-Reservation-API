@@ -48,6 +48,49 @@ class SeatService {
       );
     });
   }
+
+  // Release an active reservation
+  async releaseSeat(
+    eventId: number,
+    seatId: number,
+    userId: string
+  ): Promise<void> {
+    await seatRepository.tx(async (client) => {
+      const seat = await seatRepository.getSeatForUpdate(
+        client,
+        eventId,
+        seatId
+      );
+
+      if (!seat) {
+        throw ApiError.notFound("The requested seat does not exist.");
+      }
+
+      if (seat.status === SeatStatus.AVAILABLE) {
+        throw ApiError.badRequest("This seat is already active and available.");
+      }
+
+      if (seat.status === SeatStatus.CONFIRMED) {
+        throw ApiError.badRequest(
+          "Cannot release a fully confirmed ticket purchase."
+        );
+      }
+
+      if (seat.reserved_by !== userId) {
+        throw ApiError.forbidden(
+          "You do not have permission to release a seat reserved by someone else."
+        );
+      }
+
+      await seatRepository.updateSeatStatus(
+        client,
+        seatId,
+        SeatStatus.AVAILABLE,
+        null,
+        null
+      );
+    });
+  }
 }
 
 export const seatService = new SeatService();
