@@ -12,7 +12,7 @@ export interface Seat {
   event_id: number;
   seat_number: string;
   status: SeatStatus;
-  reserved_by: number | null;
+  reserved_by: string | null;
   reserved_at: Date | null;
 }
 
@@ -62,7 +62,7 @@ class SeatRepository {
     client: PoolClient,
     seatId: number,
     status: SeatStatus,
-    reservedBy: number | null,
+    reservedBy: string | null,
     reservedAt: Date | null
   ): Promise<void> {
     const query = `
