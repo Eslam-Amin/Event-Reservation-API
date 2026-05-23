@@ -1,6 +1,15 @@
 import { seatRepository, Seat } from "../repositories/seat.repository";
 
 class SeatService {
+  private EXPIRATION_TIME_MS = 10 * 60 * 1000; // 10 minutes lock
+
+  private isExpired(reservedAt: Date | null): boolean {
+    if (!reservedAt) return false;
+    return (
+      Date.now() - new Date(reservedAt).getTime() > this.EXPIRATION_TIME_MS
+    );
+  }
+
   // List seats with dynamic hybrid validation mapping
   async getEventsSeats(eventId: number): Promise<Seat[]> {
     const seats = await seatRepository.getSeatsByEventId(eventId);
