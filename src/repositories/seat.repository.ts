@@ -51,7 +51,7 @@ class SeatRepository {
   ): Promise<Seat | null> {
     const query = `
       SELECT * FROM seats 
-      WHERE id = $1 AND event_id = $2 AND status != 'CONFIRMED'
+      WHERE id = $1 AND event_id = $2
       FOR UPDATE
     `;
     const { rows } = await client.query(query, [seatId, eventId]);
