@@ -91,6 +91,43 @@ class SeatService {
       );
     });
   }
+
+  async confirmSeat(
+    eventId: number,
+    seatId: number,
+    userId: string
+  ): Promise<void> {
+    await seatRepository.tx(async (client) => {
+      const seat = await seatRepository.getSeatForUpdate(
+        client,
+        eventId,
+        seatId
+      );
+
+      if (!seat) {
+        throw ApiError.notFound("The requested seat does not exist.");
+      }
+
+      if (seat.status !== SeatStatus.RESERVED) {
+        throw ApiError.badRequest("This seat is not reserved.");
+      }
+
+      if (seat.reserved_by !== userId) {
+        throw ApiError.forbidden(
+          "You do not have permission to confirm a seat reserved by someone else."
+        );
+      }
+
+      await seatRepository.updateSeatStatus(
+        client,
+        seatId,
+        SeatStatus.CONFIRMED,
+        userId,
+        null,
+        new Date()
+      );
+    });
+  }
 }
 
 export const seatService = new SeatService();

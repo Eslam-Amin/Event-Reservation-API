@@ -14,6 +14,7 @@ export interface Seat {
   status: SeatStatus;
   reserved_by: string | null;
   reserved_at: Date | null;
+  confirmed_at: Date | null;
 }
 
 class SeatRepository {
@@ -63,14 +64,21 @@ class SeatRepository {
     seatId: number,
     status: SeatStatus,
     reservedBy: string | null,
-    reservedAt: Date | null
+    reservedAt: Date | null,
+    confirmedAt?: Date | null
   ): Promise<void> {
     const query = `
       UPDATE seats 
-      SET status = $1, reserved_by = $2, reserved_at = $3 
-      WHERE id = $4
+      SET status = $1, reserved_by = $2, reserved_at = $3, confirmed_at = $4 
+      WHERE id = $5
     `;
-    await client.query(query, [status, reservedBy, reservedAt, seatId]);
+    await client.query(query, [
+      status,
+      reservedBy,
+      reservedAt,
+      confirmedAt,
+      seatId
+    ]);
   }
 }
 
