@@ -126,6 +126,12 @@ class SeatService {
         throw ApiError.badRequest("This seat is not reserved.");
       }
 
+      if (this.isExpired(seat.reserved_at)) {
+        throw ApiError.badRequest(
+          "This seat's reservation has been already expired."
+        );
+      }
+
       if (seat.reserved_by !== userId) {
         throw ApiError.forbidden(
           "You do not have permission to confirm a seat reserved by someone else."
