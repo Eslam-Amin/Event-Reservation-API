@@ -25,6 +25,22 @@ class SeatRepository {
     const { rows } = await this.db.query(query, [eventId]);
     return rows;
   }
+
+  // Atomic state tracking update
+  async updateSeatStatus(
+    client: PoolClient,
+    seatId: number,
+    status: SeatStatus,
+    reservedBy: number | null,
+    reservedAt: Date | null
+  ): Promise<void> {
+    const query = `
+      UPDATE seats 
+      SET status = $1, reserved_by = $2, reserved_at = $3 
+      WHERE id = $4
+    `;
+    await client.query(query, [status, reservedBy, reservedAt, seatId]);
+  }
 }
 
 export const seatRepository = new SeatRepository();
