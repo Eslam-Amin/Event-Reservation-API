@@ -1,4 +1,9 @@
-import { seatRepository, Seat } from "../repositories/seat.repository";
+import {
+  seatRepository,
+  Seat,
+  SeatStatus
+} from "../repositories/seat.repository";
+import { ApiError } from "../utils/ApiError";
 
 class SeatService {
   private EXPIRATION_TIME_MS = 10 * 60 * 1000; // 10 minutes lock
