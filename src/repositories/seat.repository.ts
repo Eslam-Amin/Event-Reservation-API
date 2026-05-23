@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import { Pool, PoolClient } from "pg";
 import pool from "../config/database";
 
 export enum SeatStatus {
@@ -24,6 +24,37 @@ class SeatRepository {
     const query = `SELECT * FROM seats WHERE event_id = $1 and status != 'CONFIRMED' ORDER BY id ASC`;
     const { rows } = await this.db.query(query, [eventId]);
     return rows;
+  }
+
+  // Database transaction wrapper utility
+  async tx<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
+    const client = await this.db.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await callback(client);
+      await client.query("COMMIT");
+      return result;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  // Row locking mechanism using Pessimistic Locking
+  async getSeatForUpdate(
+    client: PoolClient,
+    eventId: number,
+    seatId: number
+  ): Promise<Seat | null> {
+    const query = `
+      SELECT * FROM seats 
+      WHERE id = $1 AND event_id = $2 
+      FOR UPDATE
+    `;
+    const { rows } = await client.query(query, [seatId, eventId]);
+    return rows[0] || null;
   }
 
   // Atomic state tracking update
