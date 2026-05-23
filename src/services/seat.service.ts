@@ -18,7 +18,22 @@ class SeatService {
   // List seats with dynamic hybrid validation mapping
   async getEventsSeats(eventId: number): Promise<Seat[]> {
     const seats = await seatRepository.getSeatsByEventId(eventId);
-    return seats;
+
+    return seats.map((seat) => {
+      // Lazy-evaluation check: If database record is expired, mask it to user as AVAILABLE
+      if (
+        seat.status === SeatStatus.RESERVED &&
+        this.isExpired(seat.reserved_at)
+      ) {
+        return {
+          ...seat,
+          status: SeatStatus.AVAILABLE,
+          reserved_by: null,
+          reserved_at: null
+        };
+      }
+      return seat;
+    });
   }
 
   // Lock a single targeted seat
