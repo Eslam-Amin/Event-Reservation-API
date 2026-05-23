@@ -78,19 +78,13 @@ class SeatService {
 
       if (!seat) {
         throw ApiError.notFound("The requested seat does not exist.");
-      }
-
-      if (seat.status === SeatStatus.AVAILABLE) {
+      } else if (seat.status === SeatStatus.AVAILABLE) {
         throw ApiError.badRequest("This seat is already active and available.");
-      }
-
-      if (seat.status === SeatStatus.CONFIRMED) {
+      } else if (seat.status === SeatStatus.CONFIRMED) {
         throw ApiError.badRequest(
           "Cannot release a fully confirmed ticket purchase."
         );
-      }
-
-      if (seat.reserved_by !== userId) {
+      } else if (seat.reserved_by !== userId) {
         throw ApiError.forbidden(
           "You do not have permission to release a seat reserved by someone else."
         );
@@ -120,19 +114,13 @@ class SeatService {
 
       if (!seat) {
         throw ApiError.notFound("The requested seat does not exist.");
-      }
-
-      if (seat.status !== SeatStatus.RESERVED) {
+      } else if (seat.status !== SeatStatus.RESERVED) {
         throw ApiError.badRequest("This seat is not reserved.");
-      }
-
-      if (this.isExpired(seat.reserved_at)) {
+      } else if (this.isExpired(seat.reserved_at)) {
         throw ApiError.badRequest(
           "This seat's reservation has been already expired."
         );
-      }
-
-      if (seat.reserved_by !== userId) {
+      } else if (seat.reserved_by !== userId) {
         throw ApiError.forbidden(
           "You do not have permission to confirm a seat reserved by someone else."
         );
