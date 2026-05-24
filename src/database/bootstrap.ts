@@ -47,6 +47,12 @@ export const bootstrapDatabase = async (): Promise<void> => {
 // Allows running independently via terminal
 if (require.main === module) {
   bootstrapDatabase()
-    .then(() => process.exit(0))
-    .catch(() => process.exit(1));
+    .then(() => {
+      console.log("[Bootstrap] Run completed successfully.");
+      process.exit(0);
+    })
+    .catch(() => {
+      console.log("[Bootstrap] Failed to bootstrap database.");
+      process.exit(1);
+    });
 }

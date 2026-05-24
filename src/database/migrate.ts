@@ -27,6 +27,12 @@ export const runMigrations = async (): Promise<void> => {
 // Enables execution directly via terminal command if called independently
 if (require.main === module) {
   runMigrations()
-    .then(() => process.exit(0))
-    .catch(() => process.exit(1));
+    .then(() => {
+      console.log("[Migration] Run completed successfully.");
+      process.exit(0);
+    })
+    .catch(() => {
+      console.log("[Migration] Run aborted due to errors.");
+      process.exit(1);
+    });
 }
