@@ -26,7 +26,7 @@ class SeatController {
       res: Response
     ): Promise<void> => {
       const eventId = parseInt(req.params.id, 10);
-      const seatId = req.params.seatId;
+      const seatId = parseInt(req.params.seatId, 10);
       const userId = req.body.email;
 
       await seatService.reserveSeat(eventId, seatId, userId);
@@ -44,7 +44,7 @@ class SeatController {
       res: Response
     ): Promise<void> => {
       const eventId = parseInt(req.params.id, 10);
-      const seatId = req.params.seatId;
+      const seatId = parseInt(req.params.seatId, 10);
       const userId = req.body.email;
 
       await seatService.releaseSeat(eventId, seatId, userId);
@@ -62,7 +62,7 @@ class SeatController {
       res: Response
     ): Promise<void> => {
       const eventId = parseInt(req.params.id, 10);
-      const seatId = req.params.seatId;
+      const seatId = parseInt(req.params.seatId, 10);
       const userId = req.body.email;
       await seatService.confirmSeat(eventId, seatId, userId);
 
