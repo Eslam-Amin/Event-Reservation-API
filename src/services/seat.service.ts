@@ -39,7 +39,7 @@ class SeatService {
   // Lock a single targeted seat
   async reserveSeat(
     eventId: number,
-    seatId: number,
+    seatId: string,
     userId: string
   ): Promise<void> {
     await seatRepository.tx(async (client) => {
@@ -81,7 +81,7 @@ class SeatService {
   // Release an active reservation
   async releaseSeat(
     eventId: number,
-    seatId: number,
+    seatId: string,
     userId: string
   ): Promise<void> {
     await seatRepository.tx(async (client) => {
@@ -117,7 +117,7 @@ class SeatService {
 
   async confirmSeat(
     eventId: number,
-    seatId: number,
+    seatId: string,
     userId: string
   ): Promise<void> {
     await seatRepository.tx(async (client) => {

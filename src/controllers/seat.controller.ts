@@ -22,12 +22,12 @@ class SeatController {
 
   reserveSeat = catchAsync(
     async (
-      req: Request<Params, {}, { user: { email: string } }>,
+      req: Request<Params, {}, { email: string }>,
       res: Response
     ): Promise<void> => {
       const eventId = parseInt(req.params.id, 10);
-      const seatId = parseInt(req.params.seatId, 10);
-      const userId = req.body.user.email;
+      const seatId = req.params.seatId;
+      const userId = req.body.email;
 
       await seatService.reserveSeat(eventId, seatId, userId);
 
@@ -40,12 +40,12 @@ class SeatController {
 
   releaseSeat = catchAsync(
     async (
-      req: Request<Params, {}, { user: { email: string } }>,
+      req: Request<Params, {}, { email: string }>,
       res: Response
     ): Promise<void> => {
       const eventId = parseInt(req.params.id, 10);
-      const seatId = parseInt(req.params.seatId, 10);
-      const userId = req.body.user.email;
+      const seatId = req.params.seatId;
+      const userId = req.body.email;
 
       await seatService.releaseSeat(eventId, seatId, userId);
 
@@ -58,12 +58,12 @@ class SeatController {
 
   confirmSeat = catchAsync(
     async (
-      req: Request<Params, {}, { user: { email: string } }>,
+      req: Request<Params, {}, { email: string }>,
       res: Response
     ): Promise<void> => {
       const eventId = parseInt(req.params.id, 10);
-      const seatId = parseInt(req.params.seatId, 10);
-      const userId = req.body.user.email;
+      const seatId = req.params.seatId;
+      const userId = req.body.email;
       await seatService.confirmSeat(eventId, seatId, userId);
 
       res.status(200).json({

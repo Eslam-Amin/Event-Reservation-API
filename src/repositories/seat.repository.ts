@@ -47,13 +47,14 @@ class SeatRepository {
   async getSeatForUpdate(
     client: PoolClient,
     eventId: number,
-    seatId: number
+    seatId: string
   ): Promise<Seat | null> {
     const query = `
       SELECT * FROM seats 
-      WHERE id = $1 AND event_id = $2
+      WHERE seat_number = $1 AND event_id = $2
       FOR UPDATE
     `;
+
     const { rows } = await client.query(query, [seatId, eventId]);
     return rows[0] || null;
   }
@@ -61,7 +62,7 @@ class SeatRepository {
   // Atomic state tracking update
   async updateSeatStatus(
     client: PoolClient,
-    seatId: number,
+    seatId: string,
     status: SeatStatus,
     reservedBy: string | null,
     reservedAt: Date | null,
@@ -70,7 +71,7 @@ class SeatRepository {
     const query = `
       UPDATE seats 
       SET status = $1, reserved_by = $2, reserved_at = $3, confirmed_at = $4 
-      WHERE id = $5
+      WHERE seat_number = $5
     `;
     await client.query(query, [
       status,
