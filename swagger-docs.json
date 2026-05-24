@@ -79,10 +79,10 @@
             "name": "seatId",
             "in": "path",
             "required": true,
-            "description": "The unique identifier of the target seat",
+            "description": "The unique numeric identifier of the target seat",
             "schema": {
               "type": "string",
-              "example": "2-A"
+              "example": "2"
             }
           }
         ],
@@ -167,10 +167,10 @@
             "name": "seatId",
             "in": "path",
             "required": true,
-            "description": "The unique identifier of the target seat",
+            "description": "The unique numeric identifier of the target seat",
             "schema": {
               "type": "string",
-              "example": "2-A"
+              "example": "2"
             }
           }
         ],
