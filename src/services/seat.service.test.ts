@@ -55,5 +55,50 @@ describe("SeatService Unit Tests (v1.0.0)", () => {
         ApiError.badRequest("This seat is already reserved by another user.")
       );
     });
+
+    it("should safely reject the second concurrent request when two calls execute at the exact same time", async () => {
+      let resolveRowLock: (value: any) => void = () => {};
+      const databaseLockLatencyPromise = new Promise((resolve) => {
+        resolveRowLock = resolve;
+      });
+
+      const mockSeatData = {
+        id: 10,
+        event_id: 1,
+        seat_number: "A-10",
+        status: "AVAILABLE"
+      };
+
+      mockRepository.getSeatForUpdate.mockImplementationOnce(async () => {
+        await databaseLockLatencyPromise; // Simulates holding a row-level transactional lock
+        return mockSeatData;
+      });
+
+      mockRepository.getSeatForUpdate.mockImplementationOnce(async () => {
+        return { ...mockSeatData, status: "RESERVED" }; // Wakes up to find Request 1 changed the state
+      });
+
+      const request1Promise = seatService.reserveSeat(10, "buyer_one@test.com");
+      const request2Promise = seatService.reserveSeat(10, "buyer_two@test.com");
+
+      resolveRowLock(mockSeatData);
+
+      const outcomes = await Promise.allSettled([
+        request1Promise,
+        request2Promise
+      ]);
+
+      const successCall = outcomes.find((o) => o.status === "fulfilled");
+      const rejectedCall = outcomes.find(
+        (o) => o.status === "rejected"
+      ) as PromiseRejectedResult;
+
+      expect(successCall).toBeDefined();
+      expect(rejectedCall).toBeDefined();
+      expect(rejectedCall.reason.statusCode).toBe(400);
+      expect(rejectedCall.reason.message).toContain(
+        "This seat is already reserved by another user."
+      );
+    });
   });
 });
