@@ -25,11 +25,10 @@ class SeatController {
       req: Request<Params, {}, { email: string }>,
       res: Response
     ): Promise<void> => {
-      const eventId = parseInt(req.params.id, 10);
       const seatId = parseInt(req.params.seatId, 10);
       const userId = req.body.email;
 
-      await seatService.reserveSeat(eventId, seatId, userId);
+      await seatService.reserveSeat(seatId, userId);
 
       res.status(200).json({
         success: true,
@@ -43,11 +42,10 @@ class SeatController {
       req: Request<Params, {}, { email: string }>,
       res: Response
     ): Promise<void> => {
-      const eventId = parseInt(req.params.id, 10);
       const seatId = parseInt(req.params.seatId, 10);
       const userId = req.body.email;
 
-      await seatService.releaseSeat(eventId, seatId, userId);
+      await seatService.releaseSeat(seatId, userId);
 
       res.status(200).json({
         success: true,
@@ -61,10 +59,9 @@ class SeatController {
       req: Request<Params, {}, { email: string }>,
       res: Response
     ): Promise<void> => {
-      const eventId = parseInt(req.params.id, 10);
       const seatId = parseInt(req.params.seatId, 10);
       const userId = req.body.email;
-      await seatService.confirmSeat(eventId, seatId, userId);
+      await seatService.confirmSeat(seatId, userId);
 
       res.status(200).json({
         success: true,

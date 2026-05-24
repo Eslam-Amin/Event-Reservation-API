@@ -46,16 +46,15 @@ class SeatRepository {
   // Row locking mechanism using Pessimistic Locking
   async getSeatForUpdate(
     client: PoolClient,
-    eventId: number,
     seatId: number
   ): Promise<Seat | null> {
     const query = `
       SELECT * FROM seats 
-      WHERE seat_number = $1 AND event_id = $2
+      WHERE id = $1
       FOR UPDATE
     `;
 
-    const { rows } = await client.query(query, [seatId, eventId]);
+    const { rows } = await client.query(query, [seatId]);
     return rows[0] || null;
   }
 
@@ -71,7 +70,7 @@ class SeatRepository {
     const query = `
       UPDATE seats 
       SET status = $1, reserved_by = $2, reserved_at = $3, confirmed_at = $4 
-      WHERE seat_number = $5
+      WHERE id = $5
     `;
     await client.query(query, [
       status,

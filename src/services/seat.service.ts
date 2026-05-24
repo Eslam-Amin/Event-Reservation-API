@@ -38,17 +38,9 @@ class SeatService {
   }
 
   // Lock a single targeted seat
-  async reserveSeat(
-    eventId: number,
-    seatId: number,
-    userId: string
-  ): Promise<void> {
+  async reserveSeat(seatId: number, userId: string): Promise<void> {
     await this.seatRepository.tx(async (client) => {
-      const seat = await this.seatRepository.getSeatForUpdate(
-        client,
-        eventId,
-        seatId
-      );
+      const seat = await this.seatRepository.getSeatForUpdate(client, seatId);
 
       if (!seat) {
         throw ApiError.notFound(
@@ -80,17 +72,9 @@ class SeatService {
   }
 
   // Release an active reservation
-  async releaseSeat(
-    eventId: number,
-    seatId: number,
-    userId: string
-  ): Promise<void> {
+  async releaseSeat(seatId: number, userId: string): Promise<void> {
     await this.seatRepository.tx(async (client) => {
-      const seat = await this.seatRepository.getSeatForUpdate(
-        client,
-        eventId,
-        seatId
-      );
+      const seat = await this.seatRepository.getSeatForUpdate(client, seatId);
 
       if (!seat) {
         throw ApiError.notFound("The requested seat does not exist.");
@@ -116,17 +100,9 @@ class SeatService {
     });
   }
 
-  async confirmSeat(
-    eventId: number,
-    seatId: number,
-    userId: string
-  ): Promise<void> {
+  async confirmSeat(seatId: number, userId: string): Promise<void> {
     await this.seatRepository.tx(async (client) => {
-      const seat = await this.seatRepository.getSeatForUpdate(
-        client,
-        eventId,
-        seatId
-      );
+      const seat = await this.seatRepository.getSeatForUpdate(client, seatId);
 
       if (!seat) {
         throw ApiError.notFound("The requested seat does not exist.");
