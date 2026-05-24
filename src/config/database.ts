@@ -5,7 +5,7 @@ import { config } from "./env.config";
 const isProduction = config.nodeEnv === "production";
 
 const poolConfig: PoolConfig = {
-  connectionString: config.dbUrl,
+  connectionString: config.database.url,
   // Maximum number of clients checking out from the pool at any given time
   max: 20,
   // How long a client is allowed to remain idle in the pool before being closed
