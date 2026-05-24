@@ -17,4 +17,14 @@ describe("SeatService Unit Tests (v1.0.0)", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
+
+  describe("reserveSeat", () => {
+    it("should throw a 404 ApiError if the target seat record does not exist", async () => {
+      mockRepository.getSeatForUpdate.mockResolvedValue(null);
+
+      await expect(seatService.reserveSeat(999, "qa@test.com")).rejects.toThrow(
+        ApiError.notFound("The requested seat does not exist for this event.")
+      );
+    });
+  });
 });
