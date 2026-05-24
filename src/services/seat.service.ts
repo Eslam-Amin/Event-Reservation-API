@@ -6,6 +6,7 @@ import {
 import { ApiError } from "../utils/ApiError";
 
 class SeatService {
+  seatRepository = seatRepository;
   private EXPIRATION_TIME_MS = 10 * 60 * 1000; // 10 minutes lock
 
   private isExpired(reservedAt: Date | null): boolean {
@@ -42,8 +43,8 @@ class SeatService {
     seatId: string,
     userId: string
   ): Promise<void> {
-    await seatRepository.tx(async (client) => {
-      const seat = await seatRepository.getSeatForUpdate(
+    await this.seatRepository.tx(async (client) => {
+      const seat = await this.seatRepository.getSeatForUpdate(
         client,
         eventId,
         seatId
@@ -68,7 +69,7 @@ class SeatService {
       }
 
       // Assign structural asset reservation parameters securely
-      await seatRepository.updateSeatStatus(
+      await this.seatRepository.updateSeatStatus(
         client,
         seatId,
         SeatStatus.RESERVED,
@@ -84,8 +85,8 @@ class SeatService {
     seatId: string,
     userId: string
   ): Promise<void> {
-    await seatRepository.tx(async (client) => {
-      const seat = await seatRepository.getSeatForUpdate(
+    await this.seatRepository.tx(async (client) => {
+      const seat = await this.seatRepository.getSeatForUpdate(
         client,
         eventId,
         seatId
@@ -105,7 +106,7 @@ class SeatService {
         );
       }
 
-      await seatRepository.updateSeatStatus(
+      await this.seatRepository.updateSeatStatus(
         client,
         seatId,
         SeatStatus.AVAILABLE,
@@ -120,8 +121,8 @@ class SeatService {
     seatId: string,
     userId: string
   ): Promise<void> {
-    await seatRepository.tx(async (client) => {
-      const seat = await seatRepository.getSeatForUpdate(
+    await this.seatRepository.tx(async (client) => {
+      const seat = await this.seatRepository.getSeatForUpdate(
         client,
         eventId,
         seatId
@@ -141,7 +142,7 @@ class SeatService {
         );
       }
 
-      await seatRepository.updateSeatStatus(
+      await this.seatRepository.updateSeatStatus(
         client,
         seatId,
         SeatStatus.CONFIRMED,
