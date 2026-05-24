@@ -1,7 +1,7 @@
 import { seatService } from "./seat.service";
 import { ApiError } from "../utils/ApiError";
 
-describe("🛡️ SeatService Unit Tests (v1.0.0)", () => {
+describe("SeatService Unit Tests (v1.0.0)", () => {
   let mockRepository: any;
 
   beforeEach(() => {
