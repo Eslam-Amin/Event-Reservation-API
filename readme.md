@@ -44,6 +44,7 @@ ticketing-platform/
 ├── dist/                          # Compiled JavaScript production distributions
 ├── src/
 │   ├── config/
+│   │   ├── env.config.ts          # a centralized access for process.env data
 │   │   └── database.ts            # Lazy-initialized PostgreSQL connection pool wrapper
 │   ├── database/
 │   │   ├── bootstrap.ts           # Admin script to check & create database instance if missing
