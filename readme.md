@@ -72,7 +72,7 @@ ticketing-platform/
 ├── .env                           # Environment configuration keys
 ├── jest.config.js                 # Global configurations for automated test assertions
 ├── package.json                   # Project dependency manifest and lifecycle scripts
-├── swagger.json                   # Complete interactive OpenAPI doc specification
+├── swagger-docs.json                   # Complete interactive OpenAPI doc specification
 └── tsconfig.json                  # TypeScript workspace compiler rules
 
 ```
@@ -155,6 +155,15 @@ npm run test
 
 ---
 
+## Swagger Documentation
+
+you can access a swagger docs for the application through
+
+```bash
+curl -X GET http://localhost:3000/api/v1/api-docs
+
+```
+
 ## Interactive Testing Manual (cURL Requests)
 
 ### Automatic Startup Sequence
@@ -168,7 +177,7 @@ You can instantly interact with and evaluate your endpoints using the following 
 Retrieves the real-time seating inventory layout mapping for a specific event. Stale or expired reservations are masked automatically into an open availability state during retrieval.
 
 ```bash
-curl -X GET http://localhost:3000/events/1/seats
+curl -X GET http://localhost:3000/api/v1/events/1/seats
 
 ```
 
@@ -177,7 +186,7 @@ curl -X GET http://localhost:3000/events/1/seats
 Acquires an immediate row-level database lock over an individual seat configuration, linking its ownership status securely to the customer's email address.
 
 ```bash
-curl -X POST http://localhost:3000/events/1/seats/1/reserve \
+curl -X POST http://localhost:3000/api/v1/events/1/seats/1/reserve \
      -H "Content-Type: application/json" \
      -d '{"email": "developer@domain.com"}'
 
@@ -188,7 +197,18 @@ curl -X POST http://localhost:3000/events/1/seats/1/reserve \
 Drops a user's temporary holding lock instantly, verifying that the submission email matches the record holder, and shifts the seat state back into the public availability pool.
 
 ```bash
-curl -X POST http://localhost:3000/events/1/seats/1/release \
+curl -X POST http://localhost:3000/api/v1/events/1/seats/1/release \
+     -H "Content-Type: application/json" \
+     -d '{"email": "developer@domain.com"}'
+
+```
+
+#### 4. Confirm an Active Hold Manually
+
+Drops a user's temporary holding lock instantly, verifying that the submission email matches the record holder, and shifts the seat state back into the public availability pool.
+
+```bash
+curl -X POST http://localhost:3000/api/v1/events/1/seats/1/confirm \
      -H "Content-Type: application/json" \
      -d '{"email": "developer@domain.com"}'
 
@@ -204,12 +224,6 @@ The repository contains two distinct automated testing architectures designed to
 
 Focuses entirely on the core business logic layer. Using dependency mock frameworks, the system completely isolates business logic from live database connectivity. Test suites evaluate exact logic thresholds, confirming that missing configurations trigger appropriate missing status responses, confirmed resources throw duplication conflicts, and clear resources successfully dispatch update values to the lower layers.
 
-### Pipeline Integration Tests
-
-Validates the network pipeline end-to-end. Because the application assembly logic is fully separated from network binding files, the test suites mount the Express application directly into memory. Tests programmatically fire simulated HTTP requests down the routing pipeline, confirming route parameter validations, error interception responses, and data integrity transformations.
-
----
-
 ## Long-Term Engineering Roadmap
 
 ### Upcoming Feature Releases
@@ -224,6 +238,11 @@ Validates the network pipeline end-to-end. Because the application assembly logi
 - **User Registration & Secure Hashing:** Introduce a dedicated user database table with unique constraint indexing. Implement passwords protected with cryptographic salted hashes.
 - **JWT Session Authentication:** Transition out of request body email identifiers. Secure access using signed JSON Web Tokens (JWT) distributed via standard HTTP authorization header schemes.
 - **RBAC (Role-Based Access Control):** Introduce explicit permission levels (Standard User vs. Administrator). Secure administrative routes by evaluating role claims embedded within verified token payloads.
+
+- **Pipeline Integration Tests**
+  Validates the network pipeline end-to-end. Because the application assembly logic is fully separated from network binding files, the test suites mount the Express application directly into memory. Tests programmatically fire simulated HTTP requests down the routing pipeline, confirming route parameter validations, error interception responses, and data integrity transformations.
+
+---
 
 #### Version 3.0.0 — Redis Distributed Cache & High-Concurrency Architecture
 
