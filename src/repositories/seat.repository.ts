@@ -96,6 +96,17 @@ class SeatRepository {
     const { rows } = await this.db.query(query, [userId]);
     return rows[0] || null;
   }
+
+  // Background bulk updates triggered by the sweep cron worker
+  async clearExpiredReservations(expiryThreshold: Date): Promise<number> {
+    const query = `
+      UPDATE seats 
+      SET status = 'AVAILABLE', reserved_by = NULL, reserved_at = NULL 
+      WHERE status = 'RESERVED' AND reserved_at < NOW() - INTERVAL '10 minutes'
+    `;
+    const result = await this.db.query(query);
+    return result.rowCount || 0;
+  }
 }
 
 export const seatRepository = new SeatRepository();
