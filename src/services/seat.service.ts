@@ -114,13 +114,13 @@ class SeatService {
         throw ApiError.notFound("The requested seat does not exist.");
       } else if (seat.status !== SeatStatus.RESERVED) {
         throw ApiError.badRequest("This seat is not reserved.");
-      } else if (this.isExpired(seat.reserved_at)) {
-        throw ApiError.badRequest(
-          "This seat's reservation has been already expired."
-        );
       } else if (seat.reserved_by !== userId) {
         throw ApiError.forbidden(
           "You do not have permission to confirm a seat reserved by someone else."
+        );
+      } else if (this.isExpired(seat.reserved_at)) {
+        throw ApiError.badRequest(
+          "This seat's reservation has been already expired."
         );
       }
 
