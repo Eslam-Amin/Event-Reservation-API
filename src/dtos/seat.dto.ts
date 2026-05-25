@@ -1,4 +1,4 @@
-import { IsNumberString, IsString } from "class-validator";
+import { IsNumberString, IsString, IsEmail, IsNotEmpty } from "class-validator";
 
 export class EventIdParamDto {
   @IsNumberString({}, { message: "Event ID must be a string." })
@@ -11,4 +11,11 @@ export class SeatReservationParamDto {
 
   @IsString({})
   seatId!: string;
+}
+
+
+export class CreateReservationBodyDto {
+  @IsNotEmpty({ message: "Email is required" })
+  @IsEmail({}, { message: "Invalid email format" })
+  email!: string;
 }
