@@ -1,0 +1,326 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ticketing Platform Core API",
+    "description": "A high-performance mid-level backend REST API for browsing events and managing real-time seat allocations with automatic 10-minute pessimistic reservation locks.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Seats & Events",
+      "description": "Real-time layout retrieval and booking lock pipelines"
+    }
+  ],
+  "paths": {
+    "/events/{id}/seats": {
+      "get": {
+        "tags": ["Seats & Events"],
+        "summary": "List all seats for a specific event",
+        "description": "Returns the complete seating map configuration layout tied to an event ID, detailing current real-time lock availability states.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric identifier of the event",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seating layout map successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeatsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation Failed - Syntax or parameter path structural error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}/seats/{seatId}/reserve": {
+      "post": {
+        "tags": ["Seats & Events"],
+        "summary": "Reserve a specific seat",
+        "description": "Acquires a temporary pessimistic row-level database lock on a selected seat asset for exactly 10 minutes using the user's email address.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric identifier of the event",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "seatId",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric identifier of the target seat",
+            "schema": {
+              "type": "string",
+              "example": "2"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReserveSeatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Seat successfully locked and allocated for 10 minutes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Seat successfully reserved for 10 minutes."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid syntax or poorly formatted parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - The requested seat or event does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - The seat is currently held or fully purchased by another user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{id}/seats/{seatId}/release": {
+      "post": {
+        "tags": ["Seats & Events"],
+        "summary": "Release a previously reserved seat",
+        "description": "Drops an active temporary holding lock, returning the seat configuration status back to AVAILABLE immediately.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric identifier of the event",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          },
+          {
+            "name": "seatId",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric identifier of the target seat",
+            "schema": {
+              "type": "string",
+              "example": "2"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReleaseSeatRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Seat reservation successfully dropped back into open allocations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": {
+                      "type": "string",
+                      "example": "Seat reservation successfully released."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Seat is already active, or ticket is fully confirmed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - The email provided does not match the holder of the reservation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found - The specified seat does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Seat": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 2 },
+          "event_id": { "type": "integer", "example": 1 },
+          "seat_number": { "type": "string", "example": "A-2" },
+          "status": {
+            "type": "string",
+            "enum": ["AVAILABLE", "RESERVED", "CONFIRMED"],
+            "example": "RESERVED"
+          },
+          "reserved_by": {
+            "type": "string",
+            "nullable": true,
+            "example": "developer@domain.com"
+          },
+          "reserved_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": "2026-05-24T12:00:00.000Z"
+          }
+        }
+      },
+      "SeatsResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Seat"
+            }
+          }
+        }
+      },
+      "ReserveSeatRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The user email identifier clamping ownership over the locked resource state",
+            "example": "developer@domain.com"
+          }
+        }
+      },
+      "ReleaseSeatRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The user email matching the active reservation record to verify authority to release",
+            "example": "developer@domain.com"
+          }
+        }
+      },
+      "ApiErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "error": {
+            "type": "string",
+            "example": "This seat is currently held by another user."
+          },
+          "details": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "object"
+            },
+            "example": [
+              {
+                "property": "id",
+                "constraints": ["Event ID must be a valid numeric string."]
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
