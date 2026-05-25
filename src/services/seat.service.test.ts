@@ -8,6 +8,7 @@ describe("SeatService Unit Tests (v1.0.0)", () => {
     mockRepository = {
       getSeatForUpdate: jest.fn(),
       updateSeatStatus: jest.fn(),
+      getSeatByUserId: jest.fn(),
       tx: jest.fn(async (callback) => callback({}))
     };
 
