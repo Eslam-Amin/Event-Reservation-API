@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS seats (
     seat_number VARCHAR(50) NOT NULL,
     status seat_status DEFAULT 'AVAILABLE',
     reserved_by VARCHAR(255) DEFAULT NULL,
-    reserved_at TIMESTAMP,
-    confirmed_at TIMESTAMP,
+    reserved_at TIMESTAMPTZ,
+    confirmed_at TIMESTAMPTZ,
     UNIQUE(event_id, seat_number)
 );
