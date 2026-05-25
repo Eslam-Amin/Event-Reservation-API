@@ -18,14 +18,36 @@ const poolConfig: PoolConfig = {
 
 const pool = new Pool(poolConfig);
 
-pool.on("connect", () => {
-  console.log(
-    "[Database] New client successfully connected to PostgreSQL pool."
-  );
+pool.on("connect", (client) => {
+  if (config.nodeEnv === "development") {
+    console.log(
+      "[Database] New client successfully connected to PostgreSQL pool."
+    );
+
+    client.on("error", (err) => {
+      console.error(
+        "[Database Client Error] Unexpected runtime connection failure:",
+        err
+      );
+    });
+  }
+});
+
+pool.on("release", (err, client) => {
+  if (err) {
+    console.error("[Database Pool] Error during client release:", err);
+  }
+  if (config.nodeEnv === "development") {
+    console.log(
+      "[Database Pool] A client has safely returned to the idle pool."
+    );
+  }
 });
 
 pool.on("error", (err) => {
-  console.error("[Database Error] Unexpected idle client error:", err);
+  if (config.nodeEnv === "development") {
+    console.error("[Database Error] Unexpected connection error:", err);
+  }
 });
 
 export default pool;
