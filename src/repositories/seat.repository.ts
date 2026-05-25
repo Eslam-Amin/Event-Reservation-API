@@ -80,6 +80,15 @@ class SeatRepository {
       seatId
     ]);
   }
+
+  async getSeatByUserId(userId: string): Promise<Seat | null> {
+    const query = `
+      select * from seats 
+      WHERE reserved_by = $1
+    `;
+    const { rows } = await this.db.query(query, [userId]);
+    return rows[0] || null;
+  }
 }
 
 export const seatRepository = new SeatRepository();

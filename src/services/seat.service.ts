@@ -55,8 +55,14 @@ class SeatService {
           this.isExpired(seat.reserved_at));
 
       if (!isAvailable) {
+        throw ApiError.badRequest("This seat is already reserved.");
+      }
+
+      // check if user has already reserved a seat
+      const userSeat = await this.seatRepository.getSeatByUserId(userId);
+      if (userSeat) {
         throw ApiError.badRequest(
-          "This seat is already reserved by another user."
+          `You have already ${userSeat.status} your seat for this event.`
         );
       }
 
