@@ -15,7 +15,8 @@ export const validateDto = (
     next: NextFunction
   ): Promise<void> => {
     // Transform plain object to DTO instance
-    const instance = plainToInstance(dtoClass, req[target]);
+    const payload = req[target] ?? {};
+    const instance = plainToInstance(dtoClass, payload);
 
     // Validate instance
     const errors: ValidationError[] = await validate(instance, {

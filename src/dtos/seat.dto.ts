@@ -13,7 +13,6 @@ export class SeatReservationParamDto {
   seatId!: string;
 }
 
-
 export class CreateReservationBodyDto {
   @IsNotEmpty({ message: "Email is required" })
   @IsEmail({}, { message: "Invalid email format" })
