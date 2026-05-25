@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { seatController } from "../controllers/seat.controller";
 import { validateDto } from "../middlewares/validation.middleware";
-import { EventIdParamDto, SeatReservationParamDto } from "../dtos/seat.dto";
+import { EventIdParamDto, SeatReservationParamDto,CreateReservationBodyDto } from "../dtos/seat.dto";
 
 const router = Router();
 
@@ -14,18 +14,21 @@ router.get(
 router.post(
   "/events/:id/seats/:seatId/reserve",
   validateDto(SeatReservationParamDto, "params"),
+validateDto(CreateReservationBodyDto, "body"),
   seatController.reserveSeat
 );
 
 router.post(
   "/events/:id/seats/:seatId/release",
   validateDto(SeatReservationParamDto, "params"),
+validateDto(CreateReservationBodyDto, "body"),
   seatController.releaseSeat
 );
 
 router.post(
   "/events/:id/seats/:seatId/confirm",
   validateDto(SeatReservationParamDto, "params"),
+validateDto(CreateReservationBodyDto, "body"),
   seatController.confirmSeat
 );
 
