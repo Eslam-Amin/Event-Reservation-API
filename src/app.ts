@@ -8,9 +8,10 @@ import * as swaggerDocument from "../swagger-docs.json"; // Ensure resolveJsonMo
 const app: Application = express();
 
 app.use(express.json());
+const apiV1 = "/api/v1";
 // Mount Interactive Explorer UI endpoint
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use(seatRoutes);
+app.use(`${apiV1}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(apiV1, seatRoutes);
 
 app.use(globalErrorHandler);
 
