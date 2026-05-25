@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError";
 
 describe("SeatService Unit Tests (v1.0.0)", () => {
   let mockRepository: any;
+  const EXPIRATION_TIME_MS = 10 * 60 * 1000; // 10 minutes lock
 
   beforeEach(() => {
     mockRepository = {
@@ -99,6 +100,42 @@ describe("SeatService Unit Tests (v1.0.0)", () => {
       expect(rejectedCall.reason.statusCode).toBe(400);
       expect(rejectedCall.reason.message).toContain(
         "This seat is already reserved."
+      );
+    });
+
+    it("should throw a 400 error and not confirm seat if the seat's reservation has already expired", async () => {
+      const mockReservedSeat = {
+        id: 10,
+        seat_number: "A-10",
+        status: "RESERVED",
+        reserved_by: "qa@test.com",
+        event_id: 1,
+        reserved_at: Date.now() - EXPIRATION_TIME_MS
+      };
+      mockRepository.getSeatForUpdate.mockResolvedValue(mockReservedSeat);
+
+      await expect(seatService.confirmSeat(10, "qa@test.com")).rejects.toThrow(
+        ApiError.badRequest("This seat's reservation has been already expired.")
+      );
+    });
+
+    it("should throw a 403 error if another user tries to confirm a seat", async () => {
+      const mockReservedSeat = {
+        id: 10,
+        seat_number: "A-10",
+        status: "RESERVED",
+        reserved_by: "qa@test.com",
+        event_id: 1,
+        reserved_at: Date.now()
+      };
+      mockRepository.getSeatForUpdate.mockResolvedValue(mockReservedSeat);
+
+      await expect(
+        seatService.confirmSeat(10, "qa_another@test.com")
+      ).rejects.toThrow(
+        ApiError.forbidden(
+          "You do not have permission to confirm a seat reserved by someone else."
+        )
       );
     });
   });
