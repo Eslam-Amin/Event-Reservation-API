@@ -53,7 +53,7 @@ describe("SeatService Unit Tests (v1.0.0)", () => {
       mockRepository.getSeatForUpdate.mockResolvedValue(mockReservedSeat);
 
       await expect(seatService.reserveSeat(10, "qa@test.com")).rejects.toThrow(
-        ApiError.badRequest("This seat is already reserved by another user.")
+        ApiError.badRequest("This seat is already reserved.")
       );
     });
 
@@ -98,7 +98,7 @@ describe("SeatService Unit Tests (v1.0.0)", () => {
       expect(rejectedCall).toBeDefined();
       expect(rejectedCall.reason.statusCode).toBe(400);
       expect(rejectedCall.reason.message).toContain(
-        "This seat is already reserved by another user."
+        "This seat is already reserved."
       );
     });
   });
