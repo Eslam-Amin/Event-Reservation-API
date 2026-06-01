@@ -232,6 +232,7 @@ Focuses entirely on the core business logic layer. Using dependency mock framewo
 [v1.0.0: Core Engine] ──> [v2.0.0: IAM Layer] ──> [v3.0.0: Redis Cache] ──> [v4.0.0: Containerized]
 
 ```
+---
 
 #### Version 2.0.0 — Identity & Access Management (IAM) Layer
 
@@ -249,10 +250,10 @@ Focuses entirely on the core business logic layer. Using dependency mock framewo
 - **Distributed High-Speed Locking:** Shift the temporary 10-minute hold management out of relational tables and offload it to a dedicated distributed caching cluster using Time-To-Live (TTL) key structures.
 - **Database Write Offloading:** Incoming requests will query the high-speed cache first. If a seat reservation key is active in memory, the system fast-fail instantly without making costly database disk queries.
 - **Automated Expired Cleanup:** Leverage event-driven cache expiration notifications to run reactive database reconciliation tasks instead of relying on interval-based background table sweeps.
+---
 
 #### Version 4.0.0 — Containerized Orchestration & Deployment
 
 - **Dockerization:** Build production-optimized, multi-stage container images, separating compilation layers to minimize the overall deployment footprint.
 - **Multi-Container Orchestration:** Provide a unified orchestration file that provisions the Node.js API layer, an isolated relational database container, and the high-speed caching engine within an isolated virtual network with persistent storage management.
 
----
